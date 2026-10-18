@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis Estadístico Avanzado - Enterprise Edition</title>
+    
+    <!-- FAVICON Y MIMIKYU -->
+    <link rel="icon" href="MimikyuPNG.jpg" type="image/jpeg">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-main: #120822;
+            --bg-card: rgba(30, 14, 53, 0.90);
+            --border-color: #581c87;
+            --accent-color: #a855f7;
+            --accent-glow: rgba(168, 85, 247, 0.35);
+            --text-color: #ffffff;
+            --input-bg: #180a2a;
+        }
+
+        body.light-mode {
+            --bg-main: #f3e8ff;
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --border-color: #d8b4fe;
+            --accent-color: #7c3aed;
+            --accent-glow: rgba(124, 58, 237, 0.25);
+            --text-color: #1e1b4b;
+            --input-bg: #faf5ff;
+        }
+
+        body { 
+            background-color: var(--bg-main); 
+            background-image: radial-gradient(var(--border-color) 1.5px, transparent 1.5px); 
+            background-size: 24px 24px; 
+            font-family: 'Inter', sans-serif; 
+            color: var(--text-color); 
+            scroll-behavior: smooth; 
+            transition: background 0.3s ease, color 0.3s ease; 
+        }
+        
+        .app-header-container { padding: 25px 20px; position: relative; z-index: 10; }
+        .app-header { 
+            background: linear-gradient(135deg, #180a2a 0%, #2e1065 100%); 
+            padding: 35px 45px; 
+            margin-bottom: 35px; 
+            border-radius: 24px; 
+            border: 1px solid var(--border-color); 
+            border-bottom: 5px solid var(--accent-color); 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); 
+        }
+        .app-header h2 { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 2.2rem; color: #ffffff; letter-spacing: -0.5px;}
+        .app-header p { color: #ffffff; font-size: 1.05rem; opacity: 0.95; margin-bottom: 0;}
+        
+        .container { position: relative; z-index: 10; }
+        
+        .card { 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color); 
+            border-radius: 20px; 
+            margin-bottom: 28px; 
+            padding: 30px; 
+            backdrop-filter: blur(12px); 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            box-shadow: 0 15px 35px var(--accent-glow);
+        }
+        
+        .card-title { 
+            font-family: 'Nunito', sans-serif; 
+            font-size: 1.3rem; 
+            font-weight: 800; 
+            margin-bottom: 22px; 
+            color: var(--text-color); 
+            border-bottom: 2px solid var(--border-color); 
+            padding-bottom: 12px;
+        }
+        
+        .form-label { 
+            font-size: 0.92rem; 
+            font-weight: 600; 
+            color: var(--text-color); 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .form-control, .form-select { 
+            border-radius: 12px; 
+            border: 1px solid var(--border-color); 
+            padding: 12px 18px; 
+            background-color: var(--input-bg); 
+            color: var(--text-color); 
+            transition: all 0.2s ease;
+        }
+        .form-control:focus, .form-select:focus { 
+            border-color: var(--accent-color); 
+            background-color: var(--input-bg); 
+            color: var(--text-color); 
+            box-shadow: 0 0 0 4px var(--accent-glow); 
+        }
+        .form-control::placeholder { color: var(--text-color); opacity: 0.5; }
+        
+        .btn-primary-custom { 
+            background-color: var(--accent-color); 
+            color: #ffffff; 
+            font-weight: 800; 
+            border-radius: 14px; 
+            padding: 14px; 
+            border: none; 
+            width: 100%; 
+            transition: all 0.25s ease; 
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+        .btn-primary-custom:hover { 
+            opacity: 0.95; 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+        
+        .nav-tabs { border-bottom: 1px solid var(--border-color); gap: 12px; }
+        .nav-tabs .nav-link { 
+            font-family: 'Nunito', sans-serif; 
+            color: var(--text-color); 
+            font-weight: 700; 
+            border: none; 
+            padding: 14px 26px; 
+            border-radius: 14px 14px 0 0; 
+            opacity: 0.8; 
+            transition: all 0.2s;
+        }
+        .nav-tabs .nav-link:hover { opacity: 1; color: var(--accent-color); }
+        .nav-tabs .nav-link.active { 
+            background: var(--bg-card); 
+            border-top: 4px solid var(--accent-color); 
+            color: var(--text-color); 
+            opacity: 1; 
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .result-box { 
+            background-color: var(--input-bg); 
+            border-left: 5px solid var(--accent-color); 
+            border-radius: 14px; 
+            padding: 20px; 
+            margin-bottom: 22px; 
+            border: 1px solid var(--border-color); 
+            color: var(--text-color);
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .table-custom { color: var(--text-color); --bs-table-bg: transparent; margin-bottom: 0; }
+        .table-custom th { background-color: var(--border-color) !important; color: #ffffff; border-bottom: 2px solid var(--accent-color) !important; padding: 14px; font-weight: 700;}
+        .table-custom td { background-color: var(--input-bg) !important; border-bottom: 1px solid var(--border-color) !important; vertical-align: middle; color: var(--text-color) !important;}
+        
+        .table-input { background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 10px; text-align: center; width: 100%; padding: 10px; font-weight: 600;}
+        .table-input:focus { border-color: var(--accent-color); box-shadow: 0 0 0 3px var(--accent-glow); }
+        
+        .btn-sm-action { background: var(--border-color); color: #ffffff; border: 1px solid var(--accent-color); border-radius: 8px; padding: 6px 14px; transition: all 0.2s; font-weight: 600;}
+        .btn-sm-action:hover { background: var(--accent-color); color: #ffffff; }
+        
+        .step-box { font-size: 0.95rem; color: var(--text-color); display: none; margin-top: 22px; border-top: 1px dashed var(--accent-color); padding-top: 22px; animation: fadeIn 0.4s ease-in-out; }
+        .explicacion-teorica { background-color: var(--input-bg); border: 1px solid var(--border-color); padding: 18px; border-radius: 14px; margin-top: 15px; line-height: 1.7; color: var(--text-color);}
+        .formula-highlight { background-color: rgba(168, 85, 247, 0.15); padding: 10px 15px; border-radius: 8px; font-family: monospace; color: var(--text-color); font-size: 1.05rem; border: 1px solid var(--accent-color); margin-bottom: 12px;}
+        
+        /* Semáforo y What-If */
+        .semaforo { padding: 8px 14px; border-radius: 10px; font-weight: bold; font-size: 0.9rem; display: inline-block; margin-bottom: 12px;}
+        .semaforo-bajo { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+        .semaforo-moderado { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+        .semaforo-critico { background: rgba(225, 29, 72, 0.2); color: #fb7185; border: 1px solid #e11d48; }
+        
+        .whatif-box { background: rgba(168, 85, 247, 0.1); border: 1px dashed var(--accent-color); padding: 15px; border-radius: 12px; margin-top: 15px; font-size: 0.9rem;}
+
+        /* Árbol de Probabilidad */
+        .tree-container { display: flex; justify-content: center; align-items: center; margin-top: 22px; font-size: 0.85rem; text-align: center;}
+        .tree-node { background: var(--border-color); border: 1px solid var(--accent-color); border-radius: 10px; padding: 10px; margin: 6px; min-width: 110px; color: #ffffff; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
+        .tree-branch { display: flex; flex-direction: column; align-items: center; position: relative; padding: 0 12px;}
+        .tree-line { width: 2px; height: 22px; background: var(--accent-color); margin: 0 auto; }
+        .tree-row { display: flex; justify-content: center; }
+        .tree-label { color: var(--accent-color); font-weight: bold; margin-bottom: 4px;}
+
+        .info-box { background: rgba(16, 185, 129, 0.12); border-left: 5px solid #10b981; padding: 16px; margin-bottom: 22px; border-radius: 12px; font-size: 0.92rem;}
+        .badge-custom { background-color: var(--accent-color); color: #ffffff; padding: 6px 14px; border-radius: 50px; font-weight: 700;}
+        
+        /* MIMIKYU MÁS GRANDE (165px) */
+        @keyframes flotar { 
+            0% { transform: translateY(0px) rotate(0deg); } 
+            50% { transform: translateY(-15px) rotate(1deg); } 
+            100% { transform: translateY(0px) rotate(0deg); } 
+        }
+        .mimikyu-flotante { 
+            position: fixed; 
+            bottom: 25px; 
+            left: 25px; 
+            width: 165px; 
+            height: auto;
+            animation: flotar 3.5s ease-in-out infinite; 
+            z-index: 999; 
+            filter: drop-shadow(0 12px 18px rgba(0,0,0,0.6)); 
+            pointer-events: none;
+        }
+
+        @media print { 
+            body { background: white !important; color: black !important; } 
+            .mimikyu-flotante, .btn, .nav-tabs, .btn-sm-action { display: none !important; } 
+            .card { background: white !important; border: 1px solid #ccc; width: 100%; box-shadow: none !important;} 
+            .result-box, .explicacion-teorica, .formula-highlight, .info-box, .whatif-box { background: #f8f9fa !important; border: 1px solid #ccc !important; color: black !important; } 
+            .tab-pane { display: block !important; opacity: 1 !important; } 
+            #historial { display: none !important; } 
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MIMIKYU PROTAGONISTA -->
+    <img src="MimikyuPNG.jpg" alt="Mimikyu" class="mimikyu-flotante" onerror="this.style.display='none'">
+
+    <div class="app-header-container">
+        <header class="app-header d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <h2>Análisis Estadístico Corporativo</h2>
+                <p>Módulo de Decisiones Corporativas: Probabilidad Condicional y Valor Esperado</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-light btn-sm" onclick="toggleModoVisual()" title="Cambiar Tema"><i class="bi bi-sun-fill"></i></button>
+                <button class="btn btn-outline-primary btn-sm" onclick="window.print()" style="background: rgba(168,85,247,0.2); border-color:var(--accent-color); color:#ffffff; font-weight: bold;"><i class="bi bi-printer me-1"></i> PDF</button>
+                <button class="btn btn-outline-primary btn-sm" onclick="limpiarDatosEInputs()" style="background: rgba(168,85,247,0.2); border-color:var(--accent-color); color:#ffffff; font-weight: bold;"><i class="bi bi-arrow-clockwise me-1"></i> Restablecer</button>
+            </div>
+        </header>
+    </div>
+
+    <div class="container pb-5">
+        <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#bayes" type="button"><i class="bi bi-diagram-2 me-1"></i> Modelo Bayesiano</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#esperado" type="button"><i class="bi bi-bar-chart-fill me-1"></i> Valor Esperado</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#historial" type="button"><i class="bi bi-clock-history me-1"></i> Historial y Respaldo</button></li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- BAYES -->
+            <div class="tab-pane fade show active" id="bayes">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-title">Parámetros del Caso</div>
+                            
+                            <div class="info-box mb-3">
+                                <strong>💡 Tip:</strong> Rueda del ratón sobre los números para subir/bajar decimal a decimal desde 0.00.
+                            </div>
+
+                            <button class="btn btn-outline-info btn-sm mb-3 w-100" onclick="cargarPlantillaBayes()" style="color: #ffffff; font-weight: bold; border-color: var(--accent-color); border-width: 2px;">
+                                <i class="bi bi-lightning-charge"></i> Cargar Plantilla: Bujías
+                            </button>
+
+                            <div class="mb-3">
+                                <label class="form-label">Producto a Analizar</label>
+                                <input type="text" class="form-control" id="nombreProductoBayes" placeholder="Ej. Bujía, Sensor...">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Prob. A priori P(F)</label>
+                                <input type="number" class="form-control scrollable-num" id="pF" placeholder="0.00" step="any">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Sensibilidad P(+|F)</label>
+                                <input type="number" class="form-control scrollable-num" id="pPosF" placeholder="0.00" step="any">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Tasa Falso Positivo P(+|B)</label>
+                                <input type="number" class="form-control scrollable-num" id="pPosB" placeholder="0.00" step="any">
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label">Tipo de Gráfica</label>
+                                <select class="form-select form-select-sm" id="tipoGraficaBayes">
+                                    <option value="doughnut">Dona (Recomendado)</option>
+                                    <option value="line">Curva de Sensibilidad Bayesiana</option>
+                                    <option value="bar">Histograma (Barras)</option>
+                                </select>
+                            </div>
+                            <button class="btn-primary-custom" onclick="calcularBayes()">Ejecutar Análisis</button>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-title d-flex justify-content-between align-items-center">
+                                <span id="tituloReporteBayes">Dashboard de Resultados</span>
+                                <button class="btn btn-sm-action" onclick="copiarDesglose('pasosBayes')"><i class="bi bi-clipboard"></i> Copiar Desarrollo</button>
+                            </div>
+                            <div class="result-box" id="resultadoBayes"><em>Ingrese los parámetros y ejecute el análisis.</em></div>
+                            
+                            <div id="contenedorArbol" style="display: none; margin-bottom: 22px;">
+                                <h5 style="font-weight: bold; text-align: center; margin-bottom: 15px;"><i class="bi bi-diagram-3"></i> Árbol de Probabilidad</h5>
+                                <div id="dibujoArbol"></div>
+                            </div>
+
+                            <div class="row align-items-center">
+                                <div class="col-md-5"><div style="height: 240px;"><canvas id="chartBayes"></canvas></div></div>
+                                <div class="col-md-7"><div class="step-box" id="pasosBayes" style="border:none; margin:0; padding:0;"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VALOR ESPERADO -->
+            <div class="tab-pane fade" id="esperado">
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="card">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="card-title mb-0" style="border:none;">Distribución</div>
+                                <div>
+                                    <button class="btn-sm-action me-1" onclick="agregarFila()"><i class="bi bi-plus-lg"></i> Fila</button>
+                                    <button class="btn-sm-action" onclick="quitarFila()"><i class="bi bi-dash-lg"></i></button>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex gap-2 mb-3">
+                                <button class="btn btn-outline-warning btn-sm flex-fill" onclick="autocompletarProbabilidad()" style="font-weight: bold;"><i class="bi bi-magic"></i> Autocompletar a 1.0</button>
+                                <button class="btn btn-outline-success btn-sm flex-fill" onclick="exportarCSV()" style="font-weight: bold;"><i class="bi bi-filetype-csv"></i> a CSV</button>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-8">
+                                    <label class="form-label">Producto/Proceso</label>
+                                    <input type="text" class="form-control" id="nombreProductoEsperanza" placeholder="Ej. Lotes">
+                                </div>
+                                <div class="col-4">
+                                    <label class="form-label">Moneda</label>
+                                    <select class="form-select form-select-sm" id="simboloMoneda" onchange="actualizarSliderEnVivo()">
+                                        <option value="$">$ (USD/MXN)</option>
+                                        <option value="€">€ (EUR)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <table class="table table-custom text-center align-middle mb-3" id="tablaEsperanza">
+                                <thead><tr><th>Eventos (x)</th><th>Probabilidad P(x)</th></tr></thead>
+                                <tbody id="cuerpoTabla">
+                                    <tr><td><input type="number" class="table-input x-val scrollable-num" value="0" placeholder="0" step="any"></td><td><input type="number" class="table-input p-val scrollable-num" placeholder="0.00" step="any"></td></tr>
+                                    <tr><td><input type="number" class="table-input x-val scrollable-num" value="1" placeholder="0" step="any"></td><td><input type="number" class="table-input p-val scrollable-num" placeholder="0.00" step="any"></td></tr>
+                                    <tr><td><input type="number" class="table-input x-val scrollable-num" value="2" placeholder="0" step="any"></td><td><input type="number" class="table-input p-val scrollable-num" placeholder="0.00" step="any"></td></tr>
+                                </tbody>
+                            </table>
+
+                            <div class="mb-3">
+                                <label class="form-label">Tipo de Gráfica</label>
+                                <select class="form-select form-select-sm" id="tipoGraficaEsperanza">
+                                    <option value="bar">Histograma / Barras</option>
+                                    <option value="line">Línea de Tendencia</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4 p-3" style="background: var(--input-bg); border-radius: 12px; border: 1px solid var(--border-color);">
+                                <label class="form-label d-flex justify-content-between">
+                                    <span><i class="bi bi-sliders"></i> Costo por Falla</span>
+                                    <span id="valorCostoLabel" style="font-weight: 800;">$ 100.00</span>
+                                </label>
+                                <input type="range" class="form-range" id="sliderCosto" min="0" max="5000" step="50" value="100" oninput="actualizarSliderEnVivo()">
+                            </div>
+
+                            <button class="btn-primary-custom" onclick="calcularEsperanza()">Calcular Proyección</button>
+                        </div>
+                    </div>
+
+                    <div class="col-md-7">
+                        <div class="card">
+                            <div class="card-title d-flex justify-content-between align-items-center">
+                                <span id="tituloReporteEsperanza">Análisis Financiero</span>
+                                <button class="btn btn-sm-action" onclick="copiarDesglose('pasosEsperanza')"><i class="bi bi-clipboard"></i> Copiar Desarrollo</button>
+                            </div>
+                            <div class="result-box" id="resultadoEsperado"><em>Ingrese la distribución para la proyección.</em></div>
+                            <div style="height: 250px;"><canvas id="chartEsperado"></canvas></div>
+                            <div class="step-box" id="pasosEsperanza"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HISTORIAL Y RESPALDO -->
+            <div class="tab-pane fade" id="historial">
+                <div class="card">
+                    <div class="card-title d-flex justify-content-between align-items-center">
+                        <span>Registro y Respaldo de Datos (.json)</span>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-info btn-sm" onclick="exportarHistorialJSON()" style="font-weight:bold;"><i class="bi bi-download"></i> Exportar JSON</button>
+                            <label class="btn btn-outline-warning btn-sm mb-0" style="font-weight:bold; cursor:pointer;"><i class="bi bi-upload"></i> Importar JSON <input type="file" id="importFile" accept=".json" onchange="importarHistorialJSON(event)" style="display:none;"></label>
+                            <button class="btn btn-outline-danger btn-sm" onclick="borrarHistorial()" style="font-weight:bold;"><i class="bi bi-trash3"></i> Depurar</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-custom align-middle">
+                            <thead><tr><th style="border-radius: 8px 0 0 0;">Fecha</th><th>Módulo</th><th>Variables</th><th>Resultado</th><th style="border-radius: 0 8px 0 0;">Acción</th></tr></thead>
+                            <tbody id="historialBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toast-save" style="position: fixed; bottom: 25px; right: 25px; background: var(--accent-color); color: white; padding: 14px 28px; border-radius: 50px; font-size: 0.95rem; font-weight: bold; display: none; z-index: 1000; box-shadow: 0 6px 20px rgba(0,0,0,0.5);"><i class="bi bi-check-circle-fill me-2"></i>Operación exitosa.</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('keydown', function(e) {
+            if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) || (e.ctrlKey && e.key === 'U')) {
+                e.preventDefault(); return false;
+            }
+        });
+
+        let bayesChartInstance = null; 
+        let esperadoChartInstance = null;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            try {
+                if (typeof Chart !== 'undefined') Chart.defaults.color = getComputedStyle(document.body).getPropertyValue('--text-color').trim();
+                renderizarHistorial();
+                activarRuedaRaton();
+            } catch (error) { console.error(error); }
+        });
+
+        function toggleModoVisual() {
+            document.body.classList.toggle('light-mode');
+            let isLight = document.body.classList.contains('light-mode');
+            if (typeof Chart !== 'undefined') {
+                Chart.defaults.color = isLight ? '#1e1b4b' : '#ffffff';
+                if(bayesChartInstance) bayesChartInstance.update();
+                if(esperadoChartInstance) esperadoChartInstance.update();
+            }
+        }
+
+        function activarRuedaRaton() {
+            document.body.addEventListener('wheel', function(e) {
+                if(e.target.tagName === 'INPUT' && e.target.type === 'number' && document.activeElement === e.target) {
+                    e.preventDefault();
+                    let step = 0.01; 
+                    if(e.target.classList.contains('x-val')) step = 1; 
+
+                    let val = parseFloat(e.target.value) || 0.00;
+                    if (e.deltaY < 0) val += step; else val -= step; 
+
+                    if(e.target.id === 'pF' || e.target.id === 'pPosF' || e.target.id === 'pPosB' || e.target.classList.contains('p-val')) {
+                        if(val > 1) val = 1.00; if(val < 0) val = 0.00;
+                    } else { if(val < 0) val = 0; }
+                    e.target.value = val.toFixed(2);
+                }
+            }, { passive: false });
+        }
+
+        function limpiarDatosEInputs() { if(confirm("¿Desea limpiar todos los campos?")) location.reload(); }
+
+        function cargarPlantillaBayes() {
+            document.getElementById('nombreProductoBayes').value = "Bujía Automotriz";
+            document.getElementById('pF').value = "0.05"; 
+            document.getElementById('pPosF').value = "0.98"; 
+            document.getElementById('pPosB').value = "0.04"; 
+            calcularBayes();
+        }
+
+        function agregarFila() {
+            let tbody = document.getElementById('cuerpoTabla');
+            let tr = document.createElement('tr');
+            let idx = tbody.children.length;
+            tr.innerHTML = `<td><input type="number" class="table-input x-val scrollable-num" value="${idx}" placeholder="0" step="any"></td><td><input type="number" class="table-input p-val scrollable-num" placeholder="0.00" step="any"></td>`;
+            tbody.appendChild(tr);
+        }
+
+        function quitarFila() {
+            let tbody = document.getElementById('cuerpoTabla');
+            if(tbody.children.length > 2) tbody.removeChild(tbody.lastChild);
+        }
+
+        function autocompletarProbabilidad() {
+            let pVals = document.querySelectorAll('.p-val'); let suma = 0; let ultimoVacio = null;
+            pVals.forEach(input => {
+                let val = parseFloat(input.value);
+                if (!isNaN(val)) suma += val; else if (!ultimoVacio) ultimoVacio = input;
+            });
+            if (ultimoVacio && suma < 1.0) ultimoVacio.value = (1.0 - suma).toFixed(2);
+            else alert("La suma ya es 1.0 o no hay campos vacíos.");
+        }
+
+        function exportarCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,Eventos (x),Probabilidad P(x)\n";
+            let xVals = document.querySelectorAll('.x-val'); let pVals = document.querySelectorAll('.p-val');
+            for(let i=0; i<xVals.length; i++){ if(xVals[i].value !== "" && pVals[i].value !== "") csvContent += `${xVals[i].value},${pVals[i].value}\n`; }
+            const link = document.createElement("a"); link.setAttribute("href", encodeURI(csvContent)); link.setAttribute("download", "Distribucion.csv");
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        function actualizarSliderEnVivo() {
+            let costo = document.getElementById('sliderCosto').value;
+            let simbolo = document.getElementById('simboloMoneda').value;
+            document.getElementById('valorCostoLabel').innerText = `${simbolo} ${parseFloat(costo).toLocaleString()}.00`;
+            if(document.getElementById('resultadoEsperado').innerHTML.includes('E(X)')) calcularEsperanza(false);
+        }
+
+        function copiarDesglose(idElemento) {
+            let texto = document.getElementById(idElemento).innerText;
+            navigator.clipboard.writeText(texto).then(() => {
+                mostrarToast("Desglose copiado al portapapeles.");
+            });
+        }
+
+        function mostrarToast(mensaje) {
+            const t = document.getElementById('toast-save');
+            t.innerHTML = `<i class="bi bi-check-circle-fill me-2"></i>${mensaje}`;
+            t.style.display = 'block'; setTimeout(() => t.style.opacity = '1', 10); 
+            setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.style.display = 'none', 300); }, 2000);
+        }
+
+        function registrarEnHistorial(tipo, parametros, resultado, rawData) {
+            let historial = JSON.parse(localStorage.getItem('statAppHistoryFinal')) || [];
+            historial.unshift({ fecha: new Date().toLocaleString('es-MX', { hour12: true }), tipo: tipo, parametros: parametros, resultado: resultado, rawData: rawData });
+            if(historial.length > 10) historial.pop(); 
+            localStorage.setItem('statAppHistoryFinal', JSON.stringify(historial));
+            renderizarHistorial();
+            mostrarToast("Operación guardada exitosamente.");
+        }
+
+        function renderizarHistorial() {
+            let historial = JSON.parse(localStorage.getItem('statAppHistoryFinal')) || [];
+            let tbody = document.getElementById('historialBody');
+            if(historial.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4" style="font-weight: bold;">No hay registros previos.</td></tr>'; return; }
+            tbody.innerHTML = historial.map((item, index) => `
+                <tr><td class="small"><i class="bi bi-clock me-1"></i>${item.fecha}</td><td style="font-weight: bold;">${item.tipo}</td>
+                <td class="small" style="max-width: 200px;">${item.parametros}</td><td><span class="badge-custom">${item.resultado}</span></td>
+                <td><button class="btn btn-outline-info btn-sm py-0" onclick="cargarDesdeHistorial(${index})"><i class="bi bi-arrow-repeat"></i> Cargar</button></td></tr>
+            `).join('');
+        }
+
+        function borrarHistorial() { if(confirm("¿Eliminar registros?")) { localStorage.removeItem('statAppHistoryFinal'); renderizarHistorial(); } }
+
+        function exportarHistorialJSON() {
+            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(localStorage.getItem('statAppHistoryFinal') || "[]");
+            let downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "respaldo_estadistico.json");
+            document.body.appendChild(downloadAnchor); downloadAnchor.click(); downloadAnchor.remove();
+        }
+
+        function importarHistorialJSON(event) {
+            let file = event.target.files[0];
+            if (!file) return;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    let jsonParsed = JSON.parse(e.target.result);
+                    localStorage.setItem('statAppHistoryFinal', JSON.stringify(jsonParsed));
+                    renderizarHistorial();
+                    mostrarToast("Respaldo importado correctamente.");
+                } catch(err) {
+                    alert("El archivo JSON no es válido.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function cargarDesdeHistorial(index) {
+            let historial = JSON.parse(localStorage.getItem('statAppHistoryFinal')) || []; let data = historial[index].rawData;
+            if(historial[index].tipo === "Modelo Bayesiano") {
+                document.getElementById('nombreProductoBayes').value = data.prod; document.getElementById('pF').value = data.pF;
+                document.getElementById('pPosF').value = data.pPosF; document.getElementById('pPosB').value = data.pPosB;
+                bootstrap.Tab.getInstance(document.querySelector('button[data-bs-target="#bayes"]')).show(); calcularBayes(false);
+            } else {
+                document.getElementById('nombreProductoEsperanza').value = data.prod; document.getElementById('sliderCosto').value = data.costo;
+                actualizarSliderEnVivo();
+                let tbody = document.getElementById('cuerpoTabla'); tbody.innerHTML = ""; 
+                for(let i=0; i<data.xVals.length; i++) {
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `<td><input type="number" class="table-input x-val" value="${data.xVals[i]}" step="any"></td><td><input type="number" class="table-input p-val" value="${data.pVals[i]}" step="any"></td>`;
+                    tbody.appendChild(tr);
+                }
+                bootstrap.Tab.getInstance(document.querySelector('button[data-bs-target="#esperado"]')).show(); calcularEsperanza(false);
+            }
+        }
+
+        function generarArbolHtml(pF, pB, pPosF, pNegF, pPosB, pNegB) {
+            return `
+            <div class="tree-container">
+                <div class="tree-branch">
+                    <div class="tree-node">Población (1.00)</div>
+                    <div class="tree-line"></div>
+                    <div class="tree-row">
+                        <div class="tree-branch" style="margin-right:20px;">
+                            <div class="tree-label">Falla P(F) = ${pF}</div>
+                            <div class="tree-node" style="border-color:#e11d48;">
+                                <div style="color:#e11d48; margin-bottom:5px;">Positivo: ${pPosF}</div>
+                                <div style="color:#10b981;">Negativo: ${pNegF.toFixed(2)}</div>
+                            </div>
+                        </div>
+                        <div class="tree-branch">
+                            <div class="tree-label">Bueno P(B) = ${pB.toFixed(2)}</div>
+                            <div class="tree-node" style="border-color:#10b981;">
+                                <div style="color:#e11d48; margin-bottom:5px;">Falso Pos: ${pPosB}</div>
+                                <div style="color:#10b981;">Negativo: ${pNegB.toFixed(2)}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function calcularBayes(guardar = true) {
+            try {
+                let prod = document.getElementById('nombreProductoBayes').value || "el producto";
+                let pF = parseFloat(document.getElementById('pF').value) || 0; 
+                let pPosF = parseFloat(document.getElementById('pPosF').value) || 0; 
+                let pPosB = parseFloat(document.getElementById('pPosB').value) || 0;
+                
+                let pB = 1 - pF; 
+                let parteA = pF * pPosF;             
+                let parteB = pB * pPosB;             
+                let probTotal = parteA + parteB;     
+                let bayesF = probTotal > 0 ? parteA / probTotal : 0;
+                
+                // Análisis What-If (Sensibilidad Cruzada)
+                let pPosBPesimista = Math.min(1.0, pPosB * 1.20); // Sube 20%
+                let probTotalPesimista = (pF * pPosF) + (pB * pPosBPesimista);
+                let bayesPesimista = probTotalPesimista > 0 ? parteA / probTotalPesimista : 0;
+
+                let semaforoHTML = "";
+                let insight = "";
+                if(bayesF > 0.5) {
+                    semaforoHTML = `<div class="semaforo semaforo-critico">🔴 Riesgo Crítico (${(bayesF*100).toFixed(1)}% certeza de falla)</div>`;
+                    insight = `<strong>Análisis de Negocio & What-If:</strong> La probabilidad condicional supera el umbral de seguridad del 50%. En un escenario pesimista (falsos positivos +20%), la certeza sería del ${(bayesPesimista*100).toFixed(1)}%. Se recomienda auditoría inmediata en ${prod}.`;
+                } else if(bayesF > 0.2) {
+                    semaforoHTML = `<div class="semaforo semaforo-moderado">🟡 Riesgo Moderado (${(bayesF*100).toFixed(1)}% certeza)</div>`;
+                    insight = `<strong>Análisis de Negocio & What-If:</strong> Riesgo moderado detectado. Bajo un escenario pesimista, la certeza se ajusta a ${(bayesPesimista*100).toFixed(1)}%. Se sugiere monitoreo preventivo en ${prod}.`;
+                } else {
+                    semaforoHTML = `<div class="semaforo semaforo-bajo">🟢 Riesgo Bajo (${(bayesF*100).toFixed(1)}% certeza)</div>`;
+                    insight = `<strong>Análisis de Negocio & What-If:</strong> Los niveles de certeza de falla están dentro del margen aceptable. Escenario pesimista: ${(bayesPesimista*100).toFixed(1)}%.`;
+                }
+
+                document.getElementById('contenedorArbol').style.display = 'block';
+                document.getElementById('dibujoArbol').innerHTML = generarArbolHtml(pF, pB, pPosF, (1-pPosF), pPosB, (1-pPosB));
+
+                document.getElementById('tituloReporteBayes').innerText = `Reporte de Diagnóstico: ${prod.toUpperCase()}`;
+                document.getElementById('resultadoBayes').innerHTML = `
+                    ${semaforoHTML}
+                    <div class="d-flex justify-content-between mb-2"><span>Probabilidad Total P(+):</span><strong>${(probTotal * 100).toFixed(2)}%</strong></div>
+                    <div class="d-flex justify-content-between"><span style="font-weight: bold;"><i class="bi bi-lightbulb-fill me-1"></i> Teorema de Bayes P(F|+):</span><strong style="font-size: 1.2rem;">${(bayesF * 100).toFixed(2)}%</strong></div>
+                `;
+
+                document.getElementById('pasosBayes').style.display = 'block';
+                document.getElementById('pasosBayes').innerHTML = `
+                    <div class="explicacion-teorica mb-3" style="border-left: 5px solid var(--accent-color);">
+                        <strong>📚 Desarrollo Completo y Paso a Paso:</strong><br>
+                        1. <strong>Probabilidad A Priori:</strong> El artículo presenta fallas con una probabilidad de <code>P(F) = ${pF}</code>, por lo que el estado bueno es <code>P(B) = ${pB.toFixed(2)}</code>.<br>
+                        2. <strong>Numerador (Verdaderos Positivos):</strong> Multiplicamos el defecto por la sensibilidad: <code>${pF} × ${pPosF} = ${parteA.toFixed(4)}</code>.<br>
+                        3. <strong>Denominador (Probabilidad Total P(+)):</strong> Sumamos verdaderos positivos y falsos positivos: <code>(${pF} × ${pPosF}) + (${pB.toFixed(2)} × ${pPosB}) = ${parteA.toFixed(4)} + ${parteB.toFixed(4)} = ${probTotal.toFixed(4)}</code>.<br>
+                        4. <strong>Teorema de Bayes:</strong> Dividimos el numerador entre el denominador total.
+                    </div>
+                    <div class="formula-highlight text-center mb-2" style="font-weight: bold;">P(F|+) = [ P(F) × P(+|F) ] / [ P(F)·P(+|F) + P(B)·P(+|B) ]</div>
+                    <div class="text-center mb-3" style="font-family: monospace; font-size: 1.05rem;">P(F|+) = [ ${parteA.toFixed(4)} ] / [ ${probTotal.toFixed(4)} ] = <strong>${bayesF.toFixed(4)}</strong></div>
+                    <div class="whatif-box">
+                        <strong>🔮 Análisis What-If (Escenario Pesimista):</strong> Si la tasa de falso positivo aumenta un 20% (${pPosBPesimista.toFixed(2)}), el riesgo condicional pasa a <strong>${(bayesPesimista*100).toFixed(2)}%</strong>.
+                    </div>
+                    <div class="explicacion-teorica mt-3"><strong>Conclusión Ejecutiva:</strong> ${insight}</div>
+                `;
+
+                let tipoG = document.getElementById('tipoGraficaBayes').value;
+                if(typeof Chart !== 'undefined') {
+                    const ctx = document.getElementById('chartBayes').getContext('2d');
+                    if(bayesChartInstance) bayesChartInstance.destroy();
+                    
+                    if(tipoG === 'line') {
+                        let xArr = [], yArr = [];
+                        for(let i=0.01; i<=1; i+=0.05) {
+                            let pt = (i * pPosF) + ((1-i) * pPosB);
+                            let bt = pt > 0 ? (i * pPosF) / pt : 0;
+                            xArr.push((i*100).toFixed(0)+"%");
+                            yArr.push((bt*100).toFixed(2));
+                        }
+                        bayesChartInstance = new Chart(ctx, {
+                            type: 'line',
+                            data: { labels: xArr, datasets: [{ label: 'Curva P(F|+)', data: yArr, borderColor: '#a855f7', backgroundColor: 'rgba(168,85,247,0.15)', fill: true }] },
+                            options: { responsive: true, maintainAspectRatio: false }
+                        });
+                    } else {
+                        bayesChartInstance = new Chart(ctx, {
+                            type: tipoG,
+                            data: { labels: ['Defecto Real', 'Falso Positivo'], datasets: [{ data: [(bayesF * 100).toFixed(2), (100 - (bayesF * 100)).toFixed(2)], backgroundColor: ['#e11d48', '#10b981'], borderWidth: 2 }] },
+                            options: { responsive: true, maintainAspectRatio: false }
+                        });
+                    }
+                }
+
+                if(guardar) registrarEnHistorial("Modelo Bayesiano", `P(F):${pF} | Sens:${pPosF} | FP:${pPosB}`, `${(bayesF * 100).toFixed(2)}%`, { prod: prod, pF: pF, pPosF: pPosF, pPosB: pPosB });
+            } catch (e) { console.error(e); }
+        }
+
+        function calcularEsperanza(guardar = true) {
+            try {
+                let prod = document.getElementById('nombreProductoEsperanza').value || "el proceso";
+                let xVals = document.querySelectorAll('.x-val'); 
+                let pVals = document.querySelectorAll('.p-val');
+                let costo = parseFloat(document.getElementById('sliderCosto').value) || 0;
+                let simbolo = document.getElementById('simboloMoneda').value;
+                
+                let esperanza = 0, sumaP = 0, xLabels = [], pData = [], strSuma = "", desgloseHTML = "";
+                let dataXVals = [], dataPVals = [];
+
+                for(let i = 0; i < xVals.length; i++){
+                    let x = parseFloat(xVals[i].value); 
+                    let p = parseFloat(pVals[i].value);
+                    if(!isNaN(x) && !isNaN(p)) { 
+                        let subTotal = x * p;
+                        esperanza += subTotal; sumaP += p; 
+                        xLabels.push(x + " Ev."); pData.push(p * 100); 
+                        strSuma += `(${x} × ${p}) + `; 
+                        desgloseHTML += `• Evento <strong>${x}</strong> con probabilidad <strong>${p}</strong> = <code>${subTotal.toFixed(4)}</code><br>`;
+                        dataXVals.push(x); dataPVals.push(p);
+                    }
+                }
+                strSuma = strSuma.slice(0, -3);
+                
+                if (Math.abs(sumaP - 1.0) > 0.01 && sumaP > 0) {
+                    alert(`⚠️ Advertencia de validación: La suma de las probabilidades es ${sumaP.toFixed(2)}. Debe sumar exactamente 1.00 para mantener rigor matemático.`);
+                }
+
+                let impactoTotal = esperanza * costo;
+                let impactoPesimista = impactoTotal * 1.20; // Escenario What-if costo +20%
+                
+                let semaforoFin = impactoval => impactoval > 2000 ? `<div class="semaforo semaforo-critico">🔴 Impacto Financiero Alto</div>` : `<div class="semaforo semaforo-bajo">🟢 Impacto Controlado</div>`;
+
+                document.getElementById('tituloReporteEsperanza').innerText = `Proyección Financiera: ${prod.toUpperCase()}`;
+                document.getElementById('resultadoEsperado').innerHTML = `
+                    ${semaforoFin(impactoTotal)}
+                    <div class="d-flex justify-content-between mb-2"><span>Frecuencia Esperada E(X):</span><strong>${esperanza.toFixed(2)} fallas</strong></div>
+                    <div class="d-flex justify-content-between"><span style="font-weight: bold;"><i class="bi bi-cash-coin me-1"></i> Costo Proyectado:</span><strong style="font-size: 1.2rem;">${simbolo} ${impactoTotal.toLocaleString()}.00</strong></div>
+                `;
+
+                document.getElementById('pasosEsperanza').style.display = 'block';
+                document.getElementById('pasosEsperanza').innerHTML = `
+                    <div class="explicacion-teorica mb-3" style="border-left: 5px solid #10b981;">
+                        <strong>📚 Desarrollo Completo y Paso a Paso:</strong><br>
+                        1. <strong>Análisis por Evento (x · P(x)):</strong> Multiplicamos cada escenario posible por su probabilidad:<br>
+                        <div style="margin-left: 15px; margin-top: 5px;">${desgloseHTML}</div>
+                        2. <strong>Sumatoria Total E(X):</strong> Media ponderada corporativa a largo plazo.<br>
+                        3. <strong>Impacto Económico:</strong> Multiplicamos E(X) por el costo unitario de <code>${simbolo}${costo}</code>.
+                    </div>
+                    <div class="formula-highlight text-center mt-3" style="font-weight: bold;">E(X) = Σ [ x · P(x) ]</div>
+                    <div class="text-center mt-2 mb-2" style="font-family: monospace; font-size: 1.05rem;">E(X) = ${strSuma} = <strong>${esperanza.toFixed(2)}</strong></div>
+                    <div class="whatif-box">
+                        <strong>🔮 Análisis What-If (Escenario Pesimista Costo +20%):</strong> Bajo un incremento imprevisto de costos, el impacto financiero escalaría hasta <strong>${simbolo} ${impactoPesimista.toLocaleString()}</strong>.
+                    </div>
+                `;
+
+                let tipoG = document.getElementById('tipoGraficaEsperanza').value;
+                if(typeof Chart !== 'undefined') {
+                    const ctx = document.getElementById('chartEsperado').getContext('2d');
+                    if(esperadoChartInstance) esperadoChartInstance.destroy();
+                    esperadoChartInstance = new Chart(ctx, {
+                        type: tipoG,
+                        data: { labels: xLabels, datasets: [{ label: 'Probabilidad (%)', data: pData, backgroundColor: tipoG==='line'?'rgba(168,85,247,0.25)':'#9333ea', borderColor: '#a855f7', borderWidth: tipoG==='line'?3:0, fill: tipoG==='line' }] },
+                        options: { responsive: true, maintainAspectRatio: false }
+                    });
+                }
+
+                if(guardar && dataXVals.length > 0) registrarEnHistorial("Valor Esperado", `Eventos: ${dataXVals.length} | Costo: ${simbolo}${costo}`, `${simbolo}${impactoTotal.toFixed(2)}`, { prod: prod, costo: costo, xVals: dataXVals, pVals: dataPVals });
+            } catch (e) { console.error(e); }
+        }
+    </script>
+</body>
+</html>
